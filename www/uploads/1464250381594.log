@@ -1,0 +1,68 @@
+/home/pkriachu/codroid/patch.sh 1464250381594.apk local
+apktool d 1464250381594.apk
+I: Using Apktool 2.1.1 on 1464250381594.apk
+I: Loading resource table...
+I: Decoding AndroidManifest.xml with resources...
+I: Loading resource table from file: /var/www/apktool/framework/1.apk
+I: Regular manifest package...
+I: Decoding file-resources...
+I: Decoding values */* XMLs...
+I: Baksmaling classes.dex...
+I: Copying assets and libs...
+I: Copying unknown files...
+I: Copying original files...
+Build apk with local writer ...
+# enabling source code dump failed (Permission denied)
+# enable metadata output to 1464250381594.meta
+# write source codes to 1464250381594.codroid.smali
+# 1464250384.589077(+0.000) scanning directory [./1464250381594/]
+# 1464250384.590005(+0.001) 14 file(s) found
+# 1464250384.615298(+0.025) 14/14 classes; 177 methods loaded
+# 1464250384.618841(+0.004) callgraph built
+# 1464250384.623854(+0.005) blocks scanned
+# 1464250384.624357(+0.001) 5 blocks removed
+# 1464250384.624617(+0.000) blocks optimized
+# 1464250384.627111(+0.002) block id assigned (max = 236)
+# 1464250384.627895(+0.001) block meta data written (1464250381594.meta, 17184 bytes)
+# 1464250384.631162(+0.003) 14 smali files written
+# 1464250384.631179(+0.000) done.
+I: Using Apktool 2.1.1
+I: Checking whether sources has changed...
+I: Smaling smali folder into classes.dex...
+I: Checking whether resources has changed...
+I: Building resources...
+I: Building apk file...
+I: Copying unknown files/dir...
+Generating 2,048 bit RSA key pair and self-signed certificate (SHA256withRSA) with a validity of 20,000 days
+	for: CN=codroid.org, OU=ID, O=CoDroid, L=Android, ST=CoDroid, C=TW
+[Storing ./debug.keystore]
+   adding: META-INF/MANIFEST.MF
+   adding: META-INF/ANDROID.SF
+   adding: META-INF/ANDROID.RSA
+  signing: AndroidManifest.xml
+  signing: assets/Call A Cab.htm
+  signing: assets/files/loading.gif
+  signing: assets/files/logo.png
+  signing: assets/files/main.js
+  signing: assets/files/maps
+  signing: assets/files/predictadme.js
+  signing: assets/files/saved_resource
+  signing: assets/files/style.css
+  signing: classes.dex
+  signing: res/drawable-hdpi-v4/disconnected.png
+  signing: res/drawable-hdpi-v4/icon.png
+  signing: res/drawable-hdpi-v4/loading.png
+  signing: res/drawable-ldpi-v4/disconnected.png
+  signing: res/drawable-ldpi-v4/icon.png
+  signing: res/drawable-ldpi-v4/loading.png
+  signing: res/drawable-mdpi-v4/disconnected.png
+  signing: res/drawable-mdpi-v4/icon.png
+  signing: res/drawable-mdpi-v4/loading.png
+  signing: res/layout/errorpage.xml
+  signing: res/layout/loadingpage.xml
+  signing: res/layout/main.xml
+  signing: resources.arsc
+jar signed.
+
+Warning: 
+No -tsa or -tsacert is provided and this jar is not timestamped. Without a timestamp, users may not be able to validate this jar after the signer certificate's expiration date (2071-02-27) or after any future revocation date.
