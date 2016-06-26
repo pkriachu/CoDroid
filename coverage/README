@@ -1,0 +1,25 @@
+
+Class and basic types
+https://developer.android.com/reference/java/lang/Class.html
+
+Dalvik byte code
+http://source.android.com/devices/tech/dalvik/dalvik-bytecode.html
+
+- B representing the byte primitive type
+- S representing the short primitive type
+- I representing the int primitive type
+- J representing the long primitive type
+- F representing the float primitive type
+- D representing the double primitive type
+- C representing the char primitive type
+- Z representing the boolean primitive type
+- V representing void function return values
+
+
+- [I representing the int[] type
+- [Ljava/lang/String; representing the String[] type
+- [[[C representing the char[][][] type (three dimensions!)
+
+Sample command:
+./codroid -d /tmp/cc -m meta -o smali ../apks/angrybird/
+

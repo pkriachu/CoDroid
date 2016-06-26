@@ -1,0 +1,16 @@
+# ignore Android APK and CoDroid outputs
+*.apk
+*.meta
+
+# ignote temp files during runtime of CoDroid
+*.keystore
+
+# ignore the after-building files of library
+*.o
+*.a
+coverage/codroid
+coverage/dumpmeta
+codroid/localco
+
+#other
+tmp/*
