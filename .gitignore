@@ -12,5 +12,10 @@ coverage/codroid
 coverage/dumpmeta
 codroid/localco
 
+# ignore some files in www
+www/*.db
+www/uploads/*
+www/patched/*
+
 #other
 tmp/*
