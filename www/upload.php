@@ -84,10 +84,15 @@
             $db = new PDO("sqlite:./codroid.db");
             $insert = "INSERT INTO uploads (file_name, file_hash, uploader, modify_type, upload_time) ";
             $insert .= "VALUES ('$file_name', '$hash', '$uploader', '$type', datetime('now'))";
-            $db->exec($insert);
-
+            
+            if ( $db->exec($insert) )
+                $message .= "Insert success.";
+            else {
+                $message .= "Insert faild.<br />";
+                $message .= implode(" ", $db->errorInfo());
+            }
+                
             // handle exception
-            //
         } else {
             $message .= "An error occurred.";
         }

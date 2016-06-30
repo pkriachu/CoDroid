@@ -3,4 +3,5 @@
 # $1: apk file
 # $2: patch mode
 
-echo $0 $@
+
+echo $(basename $1)
