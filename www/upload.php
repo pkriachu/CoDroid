@@ -83,7 +83,7 @@
             // wtire into database
             $db = new PDO("sqlite:./codroid.db");
             $insert = "INSERT INTO uploads (file_name, file_hash, uploader, modify_type, upload_time) ";
-            $insert .= "VALUES ('$file_name', '$hash', '$uploader', '$type', datetime('now'))";
+            $insert .= "VALUES ('$file_name', '$hash', '$uploader', '$type', datetime('now', 'localtime'))";
             
             if ( $db->exec($insert) )
                 $message .= "Insert success.";

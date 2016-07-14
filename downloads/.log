@@ -1,0 +1,6 @@
+/home/pkriachu/codroid/tools/patch.sh 1468479641490.apk local
+/usr/bin/time -ap -o /home/pkriachu/codroid/www/downloads/.time /home/pkriachu/codroid/package.sh /home/pkriachu/codroid/www/uploads/1468479641490.apk local
+/home/pkriachu/codroid/package.sh /home/pkriachu/codroid/www/uploads/1468479641490.apk local
+apktool d /home/pkriachu/codroid/www/uploads/1468479641490.apk
+Destination directory (/tmp/1468479641490) already exists. Use -f switch if you want to overwrite it.
+Unable to find /tmp/1468479641490/AndroidManifest.xml

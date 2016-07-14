@@ -6,6 +6,8 @@ if [[ $# < 2 ]]; then
 	exit 1
 fi
 
+echo "$0 $@"
+
 APK_PATH=$1
 APK_NAME=$(basename $1 .apk)
 APK_DIR=$(dirname $1)
@@ -17,7 +19,7 @@ APKTOOL=apktool
 
 
 if [ ! -f "$APK_PATH" ]; then
-	echo "unable to read '$APK_PATH.apk'"
+	echo "unable to read '$APK_PATH'"
 	exit 2
 fi
 
@@ -30,7 +32,7 @@ fi
 
 # decomile the apk
 echo $APKTOOL d $APK_PATH
-$APKTOOL d -o "/tmp/$APK_NAME" $APK_PATH
+$APKTOOL d -f -o "/tmp/$APK_NAME" $APK_PATH
 
 # patch AndroidManifest.xml
 MANIFEST=/tmp/$APK_NAME/AndroidManifest.xml
