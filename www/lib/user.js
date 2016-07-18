@@ -39,10 +39,20 @@ User = {
 	validName: function(input)
 	{
 		var username = input.value;
-		if(username.trim()=="") { return this.markInvalid(input, "You forgot your user name."); }
-		if(username.indexOf("'")>-1) { return this.markInvalid(input, "Apostrophes are not allowed in user names."); }
-		if(username.length<4) { return this.markInvalid(input, "Sorry, user names must be more than 3 letters."); }
-		return this.markValid(input);
+        var valid = true;
+        var msg = "";
+		if(username.trim()=="") { valid = false; msg = "You forgot your user name."; }
+		if(username.indexOf("'")>-1) { valid = false; msg = "Apostrophes are not allowed in user names."; }
+		if(username.length<4) { valid = false; msg =  "Sorry, user names must be more than 3 letters."; }
+        
+        if(valid) {
+            this.parentNode.removeClass("has-danger");
+        } else {
+            this.parentNode.addClass("has-danger");
+        }
+        
+        
+		return valid;
 	},
 
 	/**
