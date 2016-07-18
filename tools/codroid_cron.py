@@ -16,16 +16,32 @@ import time
 import struct
 import sqlite3
 import hashlib
+import ConfigParser
 
 sys.path.append("/home/pkriachu/androguard/")
 sys.path.append("/home/pkriachu/androguard/elsim/")
 from androguard.core.bytecodes.apk import *
 
 
+codroid_conf = '../codroid.conf'
+
 codroid_root = '/home/pkriachu/codroid'
-lock_file = '/tmp/codroid_cron_lock'
-sleep_interval = 60
-lock_interval = 2 * sleep_interval
+
+patched_life_time = 0
+
+#lock_file = '/tmp/codroid_cron_lock'
+#sleep_interval = 60
+#lock_interval = 2 * sleep_interval
+
+
+
+def init() :
+    config = ConfigParser.ConfigParser()
+    config.read(codroid_conf)
+
+    try :
+        codroid_root = config.get('global', 'codroid_root')
+        file_life_time = config.get('global', 'patched_life_time')
 
 
 

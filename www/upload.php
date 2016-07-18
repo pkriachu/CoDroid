@@ -7,6 +7,28 @@
     htmlheads("Customization");
 
 
+
+	$data = false;
+
+	ini_set("display_errors", 1);
+    ini_set("error_reporting", E_ALL | E_STRICT);
+
+	// this is a demonstrator function, which gets called when new users register
+	function registration_callback($username, $email, $userdir) {
+		// all it does is bind registration data in a global array,
+		// which is echoed on the page after a registration
+		global $data;
+		$data = array($username, $email, $userdir);
+	}
+
+    require_once("user.php");
+    $USER = new User();
+
+    global $name;
+    $name = $USER->username;
+
+
+
     global $page_title, $page_content;
 
     if ( isset($_POST["upload"]) ) {
@@ -19,7 +41,9 @@
 
     function generate_index_page() {
         global $page_title, $page_content;
+        global $name;
         $page_title = "Create customized packge for online/offline testing";
+        $page_title .= "(". $name .")";
         $page_content = 
             '<form enctype="multipart/form-data" class="form-horizontal" role="form" method="post" action="upload.php">' . 
             '<div class="form-group">' .
