@@ -18,19 +18,21 @@ User = {
 	 */
 	markInvalid: function(input, reason) {
 		var classes = "";
-		if(input["class"]) { classes = input.getAttribute("class"); }
-		input.setAttribute("class", classes + " error");
-		input.title = reason;
+        pNode = $(input.parentNode);
+        pNode.removeClass("has-success");
+        pNode.children("#err").empty();
+        pNode.addClass("has-error");
+        pNode.append("<span id='err' class='text-danger'>* " + reason + "</span>");
 		return false; },
 
 	/**
 	 * marks an input field as having passed validation
 	 */
 	markValid: function(input) {
-		if(input.getAttribute("class")) {
-			var stripped = input.getAttribute("class").replace("error", "");
-			input.setAttribute("class", stripped); }
-		input.title = "";
+        pNode = $(input.parentNode);
+        pNode.removeClass("has-error");
+        pNode.addClass("has-success");
+        pNode.children("#err").empty();
 		return true; },
 
 	/**
@@ -41,7 +43,7 @@ User = {
 		var username = input.value;
 		if(username.trim()=="") { return this.markInvalid(input, "You forgot your user name."); }
 		if(username.indexOf("'")>-1) { return this.markInvalid(input, "Apostrophes are not allowed in user names."); }
-		if(username.length<4) { return this.markInvalid(input, "Sorry, user names must be more than 3 letters."); }
+		if(username.length<4) { return this.markInvalid(input, "Sorry, user names must be more than 3 letters."); }        
 		return this.markValid(input);
 	},
 
