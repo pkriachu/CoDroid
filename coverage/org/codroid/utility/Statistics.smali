@@ -16,7 +16,7 @@
 
 .field private static final shift:I = 0x4
 
-.field private static final staticPackageName:Ljava/lang/String; = "MY_PACKAGE_NAME"
+.field private static final staticPackageName:Ljava/lang/String; = "com.uberspot.a2048"
 
 .field protected static table:[Ljava/util/Hashtable; = null
     .annotation system Ldalvik/annotation/Signature;
@@ -474,7 +474,7 @@
     .line 72
     :cond_0
     :try_start_0
-    const-string v1, "MY_PACKAGE_NAME"
+    const-string v1, "com.uberspot.a2048"
 
     sput-object v1, Lorg/codroid/utility/Statistics;->packageName:Ljava/lang/String;
     :try_end_0
