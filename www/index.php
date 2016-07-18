@@ -1,187 +1,226 @@
 <?php
-  date_default_timezone_set("America/Vancouver");
-
-	$data = false;
-
-	ini_set("display_errors", 1);
-	ini_set("error_reporting", E_ALL | E_STRICT);
-
-	// this is a demonstrator function, which gets called when new users register
-	function registration_callback($username, $email, $userdir)
-	{
-		// all it does is bind registration data in a global array,
-		// which is echoed on the page after a registration
-		global $data;
-		$data = array($username, $email, $userdir);
-	}
-
-	require_once("user.php");
-	$USER = new User("registration_callback");
+    require 'vendor/autoload.php';
 ?>
-<!DOCTYPE html>
+
+<!DOCTYPE  html>
 <html>
-	<head>
-		<title>Simple PHP+SQLite user registration, log-in and operation authentication</title>
-		<meta charset="utf-8"/>
-		<script type="text/javascript" src="js/sha1.js"></script>
-		<script type="text/javascript" src="js/user.js"></script>
-		<link rel="stylesheet" type="text/css" href="style.css"></link>
-	</head>
+    <head>
+        <meta charset="utf-8">
+        <title>Codroid Test</title>
+        
+        <!-- CSS -->
+        <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" />
+        <link rel="stylesheet" href="css/social-icons.css" type="text/css" media="screen" />
+        <!--[if IE 8]>
+            <link rel="stylesheet" type="text/css" media="screen" href="css/ie8-hacks.css" />
+        <![endif]-->
+        <!-- ENDS CSS -->    
+        
+        <!-- GOOGLE FONTS 
+        <link href='http://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>-->
+        
+        <!-- JS -->
+        <script type="text/javascript" src="js/jquery-1.5.1.min.js"></script>
+        <script type="text/javascript" src="js/jquery-ui-1.8.13.custom.min.js"></script>
+        <script type="text/javascript" src="js/easing.js"></script>
+        <script type="text/javascript" src="js/jquery.scrollTo-1.4.2-min.js"></script>
+        <script type="text/javascript" src="js/jquery.cycle.all.js"></script>
+        <script type="text/javascript" src="js/custom.js"></script>
+        
+        <!-- Isotope -->
+        <script src="js/jquery.isotope.min.js"></script>
+        
+        <!--[if IE]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        
+        <!--[if IE 6]>
+            <script type="text/javascript" src="js/DD_belatedPNG.js"></script>
+            <script>
+                  /* EXAMPLE */
+                  //DD_belatedPNG.fix('*');
+            </script>
+        <![endif]-->
+        <!-- ENDS JS -->
+        
+        
+        <!-- Nivo slider -->
+        <link rel="stylesheet" href="css/nivo-slider.css" type="text/css" media="screen" />
+        <script src="js/nivo-slider/jquery.nivo.slider.js" type="text/javascript"></script>
+        <!-- ENDS Nivo slider -->
+        
+        <!-- tabs -->
+        <link rel="stylesheet" href="css/tabs.css" type="text/css" media="screen" />
+        <script type="text/javascript" src="js/tabs.js"></script>
+          <!-- ENDS tabs -->
+          
+          <!-- prettyPhoto -->
+        <script type="text/javascript" src="js/prettyPhoto/js/jquery.prettyPhoto.js"></script>
+        <link rel="stylesheet" href="js/prettyPhoto/css/prettyPhoto.css" type="text/css" media="screen" />
+        <!-- ENDS prettyPhoto -->
+        
+        <!-- superfish -->
+        <link rel="stylesheet" media="screen" href="css/superfish.css" /> 
+        <link rel="stylesheet" media="screen" href="css/superfish-left.css" /> 
+        <script type="text/javascript" src="js/superfish-1.4.8/js/hoverIntent.js"></script>
+        <script type="text/javascript" src="js/superfish-1.4.8/js/superfish.js"></script>
+        <script type="text/javascript" src="js/superfish-1.4.8/js/supersubs.js"></script>
+        <!-- ENDS superfish -->
+        
+        <!-- poshytip -->
+        <link rel="stylesheet" href="js/poshytip-1.0/src/tip-twitter/tip-twitter.css" type="text/css" />
+        <link rel="stylesheet" href="js/poshytip-1.0/src/tip-yellowsimple/tip-yellowsimple.css" type="text/css" />
+        <script type="text/javascript" src="js/poshytip-1.0/src/jquery.poshytip.min.js"></script>
+        <!-- ENDS poshytip -->
+        
+        <!-- Tweet -->
+        <link rel="stylesheet" href="css/jquery.tweet.css" media="all"  type="text/css"/> 
+        <script src="js/tweet/jquery.tweet.js" type="text/javascript"></script> 
+        <!-- ENDS Tweet -->
+        
+        <!-- Fancybox -->
+        <link rel="stylesheet" href="js/jquery.fancybox-1.3.4/fancybox/jquery.fancybox-1.3.4.css" type="text/css" media="screen" />
+        <script type="text/javascript" src="js/jquery.fancybox-1.3.4/fancybox/jquery.fancybox-1.3.4.pack.js"></script>
+        <!-- ENDS Fancybox -->
+        
+        
+        <link rel="stylesheet" href="css/index.css" type="text/css" media="screen" />
 
-	<body>
-		<h1>Simple user registration, log-in and operation authentication framework</h1>
+    </head>
+    
+    <body class="home">
 
-		<?php if($USER->error!="") { ?>
-		<p class="error">Error: <?php echo $USER->error; ?></p>
-		<?php } ?>
+            <!-- HEADER -->
+            <div id="header">
+                <!-- wrapper-header -->
+                <div class="wrapper">
+                    <!--<a href="index.html"><img id="logo" src="img/logo.png" alt="Android Behavior Monitor" /></a>-->
+                    <!-- search -->
+                    <div class="top-search">
+                        <form  method="get" id="searchform" action="#">
+                            <div>
+                                <input type="text" value="Search..." name="s" id="s" onfocus="defaultInput(this)" onblur="clearInput(this)" />
+                                <input type="submit" id="searchsubmit" value=" " />
+                            </div>
+                        </form>
+                    </div>
+                    <!-- ENDS search -->
+                </div>
+                <!-- ENDS wrapper-header -->                    
+            </div>
+            <!-- ENDS HEADER -->
+            
+            
+            <!-- Menu -->
+            <div id="menu">
+            
+            
+            
+                <!-- ENDS menu-holder -->
+                <div id="menu-holder">
+                    <!-- wrapper-menu -->
+                    <div class="wrapper">
+                        <!-- Navigation -->
+                        <ul id="nav" class="sf-menu">
+                            <li class="current-menu-item"><a href="index.html">Upload<span class="subheader">your APK</span></a></li>
+                            <li><a href="report.php">Download<span class="subheader">Repackaged APKs</span></a></li>
+                            <li><a href="#">Contact<span class="subheader">Get in touch</span></a></li>
+                        </ul>
+                        <!-- Navigation -->
+                    </div>
+                    <!-- wrapper-menu -->
+                </div>
+                <!-- ENDS menu-holder -->
+            </div>
+            <!-- ENDS Menu -->
+            
+            
+            
 
-		<p>This page is a functional demonstrator, where you can test the various functions of the
-		user framework. On the left you can register new users, log in, update your email address
-		or password, log out, or request password resets.</p>
+            
+            <!-- MAIN -->
+            <div id="main">
+                <!-- wrapper-main -->
+                <div class="wrapper">
+                    
+                    <script type="text/javascript" src="js/index.js"></script>
+                    <form id="uploadForm" enctype="multipart/form-data" method="post" action="upload.php">
+                        <input type="file" name="fileToUpload" id="fileToUpload" style="display:none;" onchange="fileSelected();" />
+                        <input type="submit" name="startUpload" id="startUpload" style="display:none;" />
+                    <!-- headline -->
+                    <div class="clear"></div>
+                    <div id="headline">
+                        <span class="main">Upload your APK</span>
+                        <span class="sub">（格式說明等等）</span>
+                    </div>
+                    <div id="uploadwindow">
+                        <input name="filename" id="filename" type="text" class="form-poshytip" readonly="readonly" />
+                        <div class="button">
+                            <a href="#" id="select" class="link-button" onclick="preSelect();"><span>Select</span></a>
+                        </div>
+                        <div class="button">
+                            <a href="#" id="upload" class="link-button-locked"><span>Upload</span></a>
+                        </div>
+                    </div>
+                    <!-- ENDS headline -->
+                    </form>
+                    
+                </div>
+                <!-- ENDS wrapper-main -->
+            </div>
+            <!-- ENDS MAIN -->
+            
 
-		<p>On the right you can see information pertaining to you, as current user. When
-		registering or logging in it will show your session identifier and authentication status, POST
-		information received by the user system, as well as the system's information and error log
-		content. The code can be downloaded from <a href="http://github.com/Pomax/Usered">github</a>
-		or for those who just want a zip file, that's <a href="https://github.com/Pomax/Usered/zipball/master">also
-		available</a>.</p>
-
-
-		<table style="width: 100%; margin-top: 1em;"><tr><td style="width: 24em; padding-top:1em;">
-<?php		if(!$USER->authenticated) { ?>
-
-			<!-- Allow a new user to register -->
-			<form class="controlbox" name="new user registration" id="registration" action="index.php" method="POST">
-				<input type="hidden" name="op" value="register"/>
-				<input type="hidden" name="sha1" value=""/>
-				<table>
-					<tr><td>user name </td><td><input type="text" name="username" value="" /></td></tr>
-					<tr><td>email address </td><td><input type="text" name="email" value="" /></td></tr>
-					<tr><td>password </td><td><input type="password" name="password1" value="" /></td></tr>
-					<tr><td>password (again) </td><td><input type="password" name="password2" value="" /></td></tr>
-				</table>
-				<input type="button" value="register" onclick="User.processRegistration()"/>
-			</form>
-<?php 		}
-
-			if(!$USER->authenticated) { ?>
-
-			<!-- Allow a user to log in -->
-			<form class="controlbox" name="log in" id="login" action="index.php" method="POST">
-				<input type="hidden" name="op" value="login"/>
-				<input type="hidden" name="sha1" value=""/>
-				<table>
-					<tr><td>user name </td><td><input type="text" name="username" value="" /></td></tr>
-					<tr><td>password </td><td><input type="password" name="password1" value="" /></td></tr>
-				</table>
-				<input type="button" value="log in" onclick="User.processLogin()"/>
-			</form>
-<?php 		}
-
-			if(!$USER->authenticated) { ?>
-
-			<!-- Request a new password from the system -->
-			<form class="controlbox" name="forgotten passwords" id="reset" action="index.php" method="POST">
-				<input type="hidden" name="op" value="reset"/>
-				<table>
-					<tr><td>email address </td><td><input type="text" name="email" value="<?php $USER->email; ?>" /></td></tr>
-				</table>
-				<input type="submit" value="reset password"/>
-			</form>
-<?php 		}
-
-			if($USER->authenticated) { ?>
-
-			<!-- Log out option -->
-			<form class="controlbox" name="log out" id="logout" action="index.php" method="POST">
-				<input type="hidden" name="op" value="logout"/>
-				<input type="hidden" name="username"value="<?php echo $_SESSION["username"]; ?>" />
-				<p>You are logged in as <?php echo $_SESSION["username"]; ?></p>
-				<input type="submit" value="log out"/>
-			</form>
-<?php 		}
-
-			if($USER->authenticated) { ?>
-
-			<!-- If a user is logged in, her or she can modify their email and password -->
-			<form class="controlbox" name="update" id="update" action="index.php" method="POST">
-				<input type="hidden" name="op" value="update"/>
-				<input type="hidden" name="sha1" value=""/>
-				<p>Update your email address and/or password here</p>
-				<table>
-					<tr><td>email address </td><td><input type="text" name="email" value="<?php $USER->email; ?>" /></td></tr>
-					<tr><td>new password </td><td><input type="password" name="password1" value="" /></td></tr>
-					<tr><td>new password (again) </td><td><input type="password" name="password2" value="" /></td></tr>
-				</table>
-				<input type="button" value="update" onclick="User.processUpdate()"/>
-			</form>
-<?php 		}
-
-			if($USER->authenticated) { ?>
-
-			<!-- If a user is logged in, they can elect to unregister -->
-			<form class="controlbox" name="unregister" id="unregister" action="index.php" method="POST">
-				<input type="hidden" name="op" value="unregister"/>
-				<input type="hidden" name="username"value="<?php echo $_SESSION["username"]; ?>" />
-				<p>To unregister, press the button...</p>
-				<input type="submit" value="unregister"/>
-			</form>
-<?php 		} ?>
-
-		</td><td style="padding-left: 4em;">
-			<p>current user: <?php echo $_SESSION["username"]; ?><br>
-			   Session token for <?php echo $_SESSION["username"]; ?>: <?php echo $_SESSION["token"]; ?><br/>(authenticated: <?php echo ($USER->authenticated ? "yes" : "no");  echo ($USER->userdir? ", user data directory: $USER->userdir" : ""); ?>)</p>
-			<hr/>
-			<p>POST: <?php echo str_replace("\n", "<br/>\n\t\t\t", print_r($_POST, true)); ?></p>
-			<hr/>
-			<p>INFO LOG: <?php echo str_replace("\n", "<br/>\n\t\t\t", print_r($USER->info_log, true)); ?></p>
-			<hr/>
-			<p>ERROR LOG: <?php echo str_replace("\n", "<br/>\n\t\t\t", print_r($USER->error_log, true)); ?></p>
-
-<?php
-			if($data !== false) { echo "data set: " . print_r($data,true); }
-?>
-		</td></tr><table>
-
-		<h2>Using the system</h2>
-
-		<div>
-			<p>The authentication script is very simple in use. Simply have the user.php script sitting somewhere
-			that your other scripts can access it, and then start any independent PHP script with these lines:</p>
-
-			<pre>	require_once("user.php");
-	$USER = new User();</pre>
-
-			<p>From that point on, there will be a $USER variable available in your script, with the following properties:</p>
-
-			<ul>
-				<li>$USER->authenticated - a boolean value that is "true" if the user is logged in, and "false" otherwise.</li>
-				<li>$USER->username - the user's user name, or "guest user" if not authenticated.</li>
-				<li>$USER->email - the user's email address, or an empty string for guest users.</li>
-				<li>$USER->role - the user's role. By default all new users have the role "user".</li>
-				<li>$USER->userdir - the user's data directory, or false if not authenticated.</li>
-			</ul>
-
-			<p>There is a second way to create a new user, which allows you to pass the name of the function that should
-			be called when a new user registers with the system. This is something you typically use only in the script that
-			acts as main entry point:</p>
-
-			<pre>	require_once("user.php");
-	$USER = new User("registration_completed_function_name");</pre>
-
-			<p>This will call your function as <i>registration_completed_function_name($username, $email, $userdir)</i>,
-			providing it with the newly registered user's username, email address and data directory location. This lets
-			you hook into the registration process to ensure that any tasks that you need performed when a new
-			user joins (such as file or database manipulations for your own system) can be triggered.</p>
-
-			<p>Note that it doesn't matter whether you use a single entry script, or several distinct scripts.
-			If you have six scripts to perform various tasks as separate files (meaning they don't require
-			or include each other), simply add the <i>require_once</i> and <i>new User()</i> lines at the
-			start of each file, and each script will be able to deal with session-authenticated users. Simply
-			make tasks conditional on $USER->authenticated, and things will just work. This includes scripts
-			that you only call through GET and POST request via XHR ("ajax" requests).</p>
-
-
-		</div>
-	</body>
+            
+            <!-- FOOTER -->
+            <div id="footer">
+                <!-- wrapper-footer -->
+                <div class="wrapper">
+                    <!-- footer-cols -->
+                    <ul id="footer-cols">
+                        <li class="col">
+                            <h6>Pages</h6>
+                            <ul>
+                                <li class="page_item"><a href="index.html">Upload</a></li>
+                                <li class="page_item"><a href="report.php">Report</a></li>
+                                <li class="page_item"><a href="#">Contact</a></li>
+                            </ul>
+                        </li>
+                        
+                        <li class="col">
+                            <h6>_</h6>
+                            <ul>
+                                <li><a href="#/">_</a></li>
+                            </ul>
+                        </li>
+                        <li class="col">
+                            <h6>-</h6>
+                            -
+                        </li>
+                        
+                    </ul>
+                    <!-- ENDS footer-cols -->
+                </div>
+                <!-- ENDS wrapper-footer -->
+            </div>
+            <!-- ENDS FOOTER -->
+        
+        
+            <!-- Bottom -->
+            <div id="bottom">
+                <!-- wrapper-bottom -->
+                <div class="wrapper">
+                    <div id="bottom-text">copyright. <a href="#"> copyright</a> </div>
+                    <!-- Social -->
+                    <ul class="social ">
+                        <li><a href="http://www.ntou.edu.tw" class="poshytip  ntou" title="National Taiwan Ocean Univisity"></a></li>
+                    </ul>
+                    <!-- ENDS Social -->
+                    <div id="to-top" class="poshytip" title="To top"></div>
+                </div>
+                <!-- ENDS wrapper-bottom -->
+            </div>
+            <!-- ENDS Bottom -->
+    
+    </body>
 </html>
