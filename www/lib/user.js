@@ -19,7 +19,7 @@ User = {
 	markInvalid: function(input, reason) {
 		var classes = "";
         pNode = $(input.parentNode);
-        pNode.addClass("has-danger");
+        pNode.addClass("danger");
         pNode.append("<span id='err'>" + reason + "</span>");
 		return false; },
 
@@ -28,7 +28,7 @@ User = {
 	 */
 	markValid: function(input) {
         pNode = $(input.parentNode);
-        pNode.removeClass("has-danger");
+        pNode.removeClass("danger");
         pNode.remove("#err");
 		return true; },
 
