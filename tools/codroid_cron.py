@@ -27,8 +27,8 @@ codroid_conf = '../codroid.conf'
 
 codroid_root = '/home/pkriachu/codroid'
 
-remote_lifetime = 259200   # 72 hours
-patched_lifetime = 86400   # 24 hours
+remote_lifetime = 259200
+patched_lifetime = 86400
 
 #lock_file = '/tmp/codroid_cron_lock'
 #sleep_interval = 60
@@ -100,8 +100,7 @@ def process_uploads() :
             now = time.time()
 
             # append apk infomation to database
-            insert.execute("INSERT INTO apks(apk_id, apk_version, apk_hash, uploader, type, process_time) VALUES (?, ?, ?, ?, ?, datetime(?, 'unixepoch', 'localtime'))", 
-                          (apk_id, apk_version, apk_hash, uploader, modify_type, now ))
+            insert.execute("INSERT INTO apks(apk_id, apk_version, apk_hash, uploader, type, process_time) VALUES (?, ?, ?, ?, ?, datetime(?, 'unixepoch', 'localtime'))", (apk_id, apk_version, apk_hash, uploader, modify_type, now ))
 
             file_id = insert.lastrowid
             file_path = "%s/downloads/%s" % (codroid_root, patch_file)
@@ -115,8 +114,7 @@ def process_uploads() :
                 (auth_code, salt) = generate_auth_code(apk_id, uploader, now+remote_lifetime)
                 cur.execute("SELECT fid FROM remote_auth WHERE authcode=?", auth_code)
             }
-            write.execute("INSERT INTO remote_auth VALUES (?, ?, ?, ?)",
-                          (file_id, auth_code, salt, now+remote_lifetime))
+            write.execute("INSERT INTO remote_auth VALUES (?, ?, ?, ?)", (file_id, auth_code, salt, now+remote_lifetime))
 
             # preprocessing: setting the transfer infomation
             with open(codroid_root + '/coverage/org_template/codroid/utility/NetworkWriterTask.smali', 'r') as source, open(codroid_root + '/coverage/org/codroid/utility/NetworkWriterTask.smali', 'w+') as target :
