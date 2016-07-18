@@ -18,7 +18,7 @@ User = {
 	 */
 	markInvalid: function(input, reason) {
 		var classes = "";
-        pNode = input.parentNode;
+        pNode = $(input.parentNode);
         pNode.addClass("has-danger");
         pNode.append("<span id='err'>" + reason + "</span>");
 		return false; },
@@ -27,7 +27,7 @@ User = {
 	 * marks an input field as having passed validation
 	 */
 	markValid: function(input) {
-        pNode = input.parentNode;
+        pNode = $(input.parentNode);
         pNode.removeClass("has-danger");
         pNode.remove("#err");
 		return true; },
