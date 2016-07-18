@@ -392,7 +392,7 @@
 
     move-result-object v18
 
-    const-string v19, "package="
+    const-string v19, "&package="
 
     invoke-virtual/range {v18 .. v19}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
