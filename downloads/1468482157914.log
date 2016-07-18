@@ -1,4 +1,0 @@
-/home/pkriachu/codroid/tools/patch.sh 1468482157914.apk local
-/usr/bin/time -ap -o /home/pkriachu/codroid/www/downloads/1468482157914.time /home/pkriachu/codroid/package.sh /home/pkriachu/codroid/www/uploads/1468482157914.apk local
-/home/pkriachu/codroid/package.sh /home/pkriachu/codroid/www/uploads/1468482157914.apk local
-unable to read '/home/pkriachu/codroid/www/uploads/1468482157914.apk'

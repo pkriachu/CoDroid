@@ -1,8 +1,8 @@
-/home/pkriachu/codroid/tools/patch.sh 1468500286555.apk local
-/usr/bin/time -ap -o /home/pkriachu/codroid/www/downloads/1468500286555.time /home/pkriachu/codroid/package.sh /home/pkriachu/codroid/www/uploads/1468500286555.apk local
-/home/pkriachu/codroid/package.sh /home/pkriachu/codroid/www/uploads/1468500286555.apk local
-apktool d /home/pkriachu/codroid/www/uploads/1468500286555.apk
-I: Using Apktool 2.1.1 on 1468500286555.apk
+/home/pkriachu/codroid/tools/patch.sh 1468856746207.apk network
+/usr/bin/time -ap -o /home/pkriachu/codroid/www/downloads/1468856746207.time /home/pkriachu/codroid/package.sh /home/pkriachu/codroid/www/uploads/1468856746207.apk network
+/home/pkriachu/codroid/package.sh /home/pkriachu/codroid/www/uploads/1468856746207.apk network
+apktool d /home/pkriachu/codroid/www/uploads/1468856746207.apk
+I: Using Apktool 2.1.1 on 1468856746207.apk
 I: Loading resource table...
 I: Decoding AndroidManifest.xml with resources...
 I: Loading resource table from file: /var/www/apktool/framework/1.apk
@@ -13,22 +13,22 @@ I: Baksmaling classes.dex...
 I: Copying assets and libs...
 I: Copying unknown files...
 I: Copying original files...
-Build apk with local writer ...
+Build apk with network writer ...
 # enable source code dump to /tmp/cc
-# enable metadata output to /home/pkriachu/codroid/www/uploads/1468500286555.meta
-# write source codes to /tmp/1468500286555/codroid.smali
-# 1468502008.817035(+0.000) scanning directory [/tmp/1468500286555/]
-# 1468502008.819881(+0.003) 532 file(s) found
-# 1468502009.132163(+0.312) 532/532 classes; 4038 methods loaded
-# 1468502009.190551(+0.058) callgraph built
-# 1468502009.268791(+0.078) blocks scanned
-# 1468502009.285287(+0.016) 807 blocks removed
-# 1468502009.295301(+0.010) blocks optimized
-# 1468502009.383278(+0.088) block id assigned (max = 9454)
-# 1468502009.435473(+0.052) source code dumped (/tmp/cc)
-# 1468502009.643289(+0.208) block meta data written (/home/pkriachu/codroid/www/uploads/1468500286555.meta, 1085728 bytes)
-# 1468502009.765307(+0.122) 532 smali files written
-# 1468502009.765332(+0.000) done.
+# enable metadata output to /home/pkriachu/codroid/www/uploads/1468856746207.meta
+# write source codes to /tmp/1468856746207/codroid.smali
+# 1468856753.936247(+0.000) scanning directory [/tmp/1468856746207/]
+# 1468856753.939139(+0.003) 532 file(s) found
+# 1468856754.288107(+0.349) 532/532 classes; 4038 methods loaded
+# 1468856754.346849(+0.059) callgraph built
+# 1468856754.424699(+0.078) blocks scanned
+# 1468856754.441084(+0.016) 807 blocks removed
+# 1468856754.451184(+0.010) blocks optimized
+# 1468856754.538985(+0.088) block id assigned (max = 9454)
+# 1468856754.592468(+0.053) source code dumped (/tmp/cc)
+# 1468856754.615156(+0.023) block meta data written (/home/pkriachu/codroid/www/uploads/1468856746207.meta, 1085728 bytes)
+# 1468856754.705423(+0.090) 532 smali files written
+# 1468856754.705445(+0.000) done.
 I: Using Apktool 2.1.1
 I: Checking whether sources has changed...
 I: Smaling smali folder into classes.dex...
@@ -84,4 +84,4 @@ Generating 2,048 bit RSA key pair and self-signed certificate (SHA256withRSA) wi
 jar signed.
 
 Warning: 
-No -tsa or -tsacert is provided and this jar is not timestamped. Without a timestamp, users may not be able to validate this jar after the signer certificate's expiration date (2071-04-17) or after any future revocation date.
+No -tsa or -tsacert is provided and this jar is not timestamped. Without a timestamp, users may not be able to validate this jar after the signer certificate's expiration date (2071-04-21) or after any future revocation date.

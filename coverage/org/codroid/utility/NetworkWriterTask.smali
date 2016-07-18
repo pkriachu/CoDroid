@@ -16,7 +16,7 @@
     invoke-direct {p0}, Lorg/codroid/utility/StatisticsTask;-><init>()V
 
     .line 25
-    const-string v0, "http://snsl.cs.ntou.edu.tw/codroid/submit.php"
+    const-string v0, "?key=4842303eb2cdd4e03335df7142d2d25c"
 
     iput-object v0, p0, Lorg/codroid/utility/NetworkWriterTask;->serverURL:Ljava/lang/String;
 
@@ -392,7 +392,7 @@
 
     move-result-object v18
 
-    const-string v19, "package="
+    const-string v19, "&package="
 
     invoke-virtual/range {v18 .. v19}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 

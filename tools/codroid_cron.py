@@ -17,6 +17,7 @@ import struct
 import sqlite3
 import hashlib
 import ConfigParser
+from random import Random
 
 sys.path.append("/home/pkriachu/androguard/")
 sys.path.append("/home/pkriachu/androguard/elsim/")
@@ -29,6 +30,7 @@ codroid_root = '/home/pkriachu/codroid'
 
 remote_lifetime = 259200
 patched_lifetime = 86400
+submit_url = ""
 
 #lock_file = '/tmp/codroid_cron_lock'
 #sleep_interval = 60
@@ -40,13 +42,15 @@ def init() :
     config = ConfigParser.ConfigParser()
     config.read(codroid_conf)
 
-    try :
-        codroid_root = config.get('global', 'codroid_root')
-        file_life_time = config.get('global', 'patched_life_time')
+    codroid_root = config.get('global', 'codroid_root')
+    patched_lifetime = config.get('global', 'patched_lifetime')
+
+    remote_lifetime = config.get('remote', 'remote_lifetime')
+    submit_url = config.get('remote', 'submit_url')
 
 
 
-def process_uploads() :
+def process_uploads() : 
     codroid_db = codroid_root + '/codroid.db'
     conn = sqlite3.connect(codroid_db)
     conn.row_factory = sqlite3.Row
@@ -60,6 +64,8 @@ def process_uploads() :
         # local patching
         if row['modify_type'] == 'local' :
             # append apk infomation to database
+            patch_file = row['file_name']
+            patch_mode = row['modify_type']
             apk_path = "%s/uploads/%s" % (codroid_root, patch_file)
             apk = APK(apk_path)
 
@@ -71,8 +77,7 @@ def process_uploads() :
 
             now = time.time()
 
-            insert.execute("INSERT INTO apks(apk_id, apk_version, apk_hash, uploader, type, process_time) VALUES (?, ?, ?, ?, ?, datetime(?, 'unixepoch', 'localtime'))", 
-                          (apk_id, apk_version, apk_hash, uploader, modify_type, now ))
+            insert.execute("INSERT INTO apks(apk_id, apk_version, apk_hash, uploader, type, process_time) VALUES (?, ?, ?, ?, ?, datetime(?, 'unixepoch', 'localtime'))", (apk_id, apk_version, apk_hash, uploader, modify_type, now ))
 
             file_id = insert.lastrowid
             file_path = "%s/downloads/%s" % (codroid_root, patch_file)
@@ -81,13 +86,13 @@ def process_uploads() :
 
             # patch apk files
             patch_script = "%s/tools/patch.sh" % (codroid_root)
-            patch_file = row['file_name']
-            patch_mode = row['modify_type']
             out = subprocess.call([patch_script, patch_file, patch_mode])
 
         # remote patching
         elif row['modify_type'] == 'remote' :
             # preprocessing: collect required infomation
+            patch_file = row['file_name']
+            patch_mode = row['modify_type']
             apk_path = "%s/uploads/%s" % (codroid_root, patch_file)
             apk = APK(apk_path)
 
@@ -105,16 +110,16 @@ def process_uploads() :
             file_id = insert.lastrowid
             file_path = "%s/downloads/%s" % (codroid_root, patch_file)
 
-            insert.execute("INSERT INTO files VALUES(?, ?)", (file_id, file_path))
+            insert.execute("INSERT INTO files VALUES(?, ?, ?)", (file_id, file_path, now+patched_lifetime))
 
             # calculating authentication code
             auth_code = ""
             cur = conn.cursor()
-            while( auth_code == "" or cur.fetchone() != None ) {
+            while auth_code == "" or cur.fetchone() != None :
                 (auth_code, salt) = generate_auth_code(apk_id, uploader, now+remote_lifetime)
-                cur.execute("SELECT fid FROM remote_auth WHERE authcode=?", auth_code)
-            }
-            write.execute("INSERT INTO remote_auth VALUES (?, ?, ?, ?)", (file_id, auth_code, salt, now+remote_lifetime))
+                cur.execute("SELECT fid FROM remote_auth WHERE authcode='%s'" % (auth_code))
+
+            insert.execute("INSERT INTO remote_auth VALUES (?, ?, ?, ?)", (file_id, auth_code, salt, now+remote_lifetime))
 
             # preprocessing: setting the transfer infomation
             with open(codroid_root + '/coverage/org_template/codroid/utility/NetworkWriterTask.smali', 'r') as source, open(codroid_root + '/coverage/org/codroid/utility/NetworkWriterTask.smali', 'w+') as target :
@@ -123,13 +128,11 @@ def process_uploads() :
                 target.write(content.replace('@SUBMIT_URL@', write_url))
             with open(codroid_root + '/coverage/org_template/codroid/utility/Statistics.smali', 'r') as source, open(codroid_root + '/coverage/org/codroid/utility/Statistics.smali', 'w+') as target :
                 content = source.read()
-                target.write(content.replace('@PACKAGE_NAME@', package_id))
+                target.write(content.replace('@PACKAGE_NAME@', apk_id))
 
             # patch apk files
             patch_script = "%s/tools/patch.sh" % (codroid_root)
-            patch_file = row['file_name']
-            patch_mode = row['modify_type']
-            out = subprocess.call([patch_script, patch_file, patch_mode])
+            out = subprocess.call([patch_script, patch_file, "network"])
 
 
         # remove file from uploads
@@ -187,7 +190,7 @@ def hash_file(file_path) :
 def generate_auth_code(apk_id, uploader, timestamp) :
     hasher = hashlib.md5()
     salt = create_salt()
-    hasher.update(apk_id + uploader + timestamp + salt)
+    hasher.update("%s%s%s%s" % (apk_id, uploader, timestamp , salt))
     return (hasher.hexdigest(), salt)
 
 
