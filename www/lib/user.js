@@ -19,8 +19,8 @@ User = {
 	markInvalid: function(input, reason) {
 		var classes = "";
 		if(input["class"]) { classes = input.getAttribute("class"); }
-		input.setAttribute("class", classes + " error");
-		input.title = reason;
+		input.setAttribute("class", classes + " has-danger");
+		input.insertAdjacentHTML( 'afterEnd', "* "+reason );
 		return false; },
 
 	/**
@@ -28,7 +28,7 @@ User = {
 	 */
 	markValid: function(input) {
 		if(input.getAttribute("class")) {
-			var stripped = input.getAttribute("class").replace("error", "");
+			var stripped = input.getAttribute("class").replace("has-danger", "");
 			input.setAttribute("class", stripped); }
 		input.title = "";
 		return true; },
@@ -39,20 +39,10 @@ User = {
 	validName: function(input)
 	{
 		var username = input.value;
-        var valid = true;
-        var msg = "";
-		if(username.trim()=="") { valid = false; msg = "You forgot your user name."; }
-		if(username.indexOf("'")>-1) { valid = false; msg = "Apostrophes are not allowed in user names."; }
-		if(username.length<4) { valid = false; msg =  "Sorry, user names must be more than 3 letters."; }
-        
-        if(valid) {
-            this.parentNode.removeClass("has-danger");
-        } else {
-            this.parentNode.addClass("has-danger");
-        }
-        
-        
-		return valid;
+		if(username.trim()=="") { return this.markInvalid(input, "You forgot your user name."); }
+		if(username.indexOf("'")>-1) { return this.markInvalid(input, "Apostrophes are not allowed in user names."); }
+		if(username.length<4) { return this.markInvalid(input, "Sorry, user names must be more than 3 letters."); }        
+		return this.markValid(input);
 	},
 
 	/**
