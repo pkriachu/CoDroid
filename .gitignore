@@ -15,6 +15,7 @@ codroid/localco
 # ignore some files in www
 www/*.db
 www/uploads/*
+www/downloads/*
 www/patched/*
 www/Usered/*
 
