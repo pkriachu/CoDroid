@@ -18,21 +18,18 @@ User = {
 	 */
 	markInvalid: function(input, reason) {
 		var classes = "";
-        input = input.parentNode;
-		if(input["class"]) { classes = input.getAttribute("class"); }
-		input.setAttribute("class", classes + " has-danger");
-		input.insertAdjacentHTML( 'afterEnd', "* "+reason );
+        pNode = input.parentNode;
+        pNode.addClass("has-danger");
+        pNode.append("<span id='err'>" + reason + "</span>");
 		return false; },
 
 	/**
 	 * marks an input field as having passed validation
 	 */
 	markValid: function(input) {
-        input = input.parentNode;
-		if(input.getAttribute("class")) {
-			var stripped = input.getAttribute("class").replace("has-danger", "");
-			input.setAttribute("class", stripped); }
-		input.title = "";
+        pNode = input.parentNode;
+        pNode.removeClass("has-danger");
+        pNode.remove("#err");
 		return true; },
 
 	/**
