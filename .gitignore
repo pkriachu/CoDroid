@@ -16,8 +16,10 @@ codroid/localco
 www/*.db
 www/uploads/*
 www/downloads/*
-www/patched/*
-www/Usered/*
+www/records/
 
 #other
+uploads/*
+downloads/*
+records/*
 tmp/*
