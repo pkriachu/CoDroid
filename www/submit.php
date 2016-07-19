@@ -5,11 +5,13 @@ ini_set("error_reporting", E_ALL | E_STRICT);
 
 
 $codroid_db = "../codroid.db";
+$info = false;
 
 $key  = "null";
 $package  = "null";
 $id   = "null";
 $data = "null";
+$timestamp = "null";
 
 
 # get remote ip
@@ -23,18 +25,11 @@ if(!empty($_SERVER['HTTP_CLIENT_IP'])){
 
 
 # pase GET parameters
-if(isset($_GET["key"])) {
-    $key = $_GET["key"];
-}
-if(isset($_GET["package"])) {
-    $package = $_GET["package"];
-}
-if(isset($_GET["id"])) {
-    $id = $_GET["id"];
-}
-if(isset($_GET["data"])) {
-    $data = $_GET["data"];
-}
+if(isset($_POST["key"]))       $key = $_POST["key"];                else die(0);
+if(isset($_POST["package"]))   $package = $_POST["package"];        else die(0);
+if(isset($_POST["id"]))        $id = $_POST["id"];                  else die(0);
+if(isset($_POST["data"]))      $data = $_POST["data"];              else die(0);
+if(isset($_POST["timestamp"])) $timestamp = $_POST["timestamp"];    else die(0);
 
 
 echo "key = $key<br />";
@@ -46,10 +41,18 @@ echo "data = $data<br />";
 
 # validate the key
 $db = new PDO("sqlite:$codroid_db");
-$query = "SELECT fid FROM remote_auth WHERE authcode='$key'";
+$query = "SELECT fid, salt, exp_time FROM remote_auth WHERE authcode='$key'";
 $result = $db->query($query);
 $row = $result->fetchALL();
 if(sizeof($row) == 1) {
+    $modify_ini = false;
+    $valid = true;
+
+    $now = time();
+    # check expire time
+    if ($now > $row[0]["exp_time"])
+        die(0);
+
     $file_id = $row[0]["fid"];
 
     # if key is validated, save the records.
@@ -58,23 +61,65 @@ if(sizeof($row) == 1) {
         mkdir($record_dir);
     }
 
-    # setting apk's infomation
+    # setting apk's infomation, and check the validation of records
     $info_file = "$record_dir/info";
-    if($is_file($info_file)) {
-        $info = parse_ini_file($info_file)["info"];
-    } else {
+    if(!is_file($info_file)) {
+        # no info file, the first time to receive a record
+        # create a new info array and save to file
         $info = array(
-            "package" => $package,
-            "key"     => $key,
-
+            "basic" => array(
+                "package" => $package,
+                "key"     => $key,
+            ),
+            "ip"      => array($id => $ip),
         );
+        write_php_ini($info, $info_file);
+    } else {
+        # info file exists, validate the record info
+        global $info;
+        $info = parse_ini_file($info_file, true);
+        if(strcmp($package, $info["basic"]["package"]) !== 0  ||  strcmp($key, $info["basic"]["key"]) !== 0) {
+            $valid = false;
+        }
+        # check ip adrress and log it
+        if(!array_key_exists($id, $info["ip"])) {
+            $info["ip"][$id] = $ip;
+            write_php_ini($info, $info_file);
+        } else {
+            $count = 0;
+            foreach($info["ip"] as $k => $v) {
+                if(strpos($k, $id) === 0) {
+                    if(strcmp($v, $ip) === 0) {
+                        $count = -1;
+                        break;
+                    } else {
+                        $count += 1;
+                    }
+                }
+            }
+            # if the ip is not in list, append it with a new suffix
+            if($count > 0) {
+                $new_id = "$id" . "_" . "$count";
+                $info["ip"][$new_id] = $ip;
+                write_php_ini($info, $info_file);
+            }
+        }
     }
 
-    
-#    $record_path = "/var/www/records/" . $package . "-" . $ip . "-" . $id;
-#    $file = fopen($record_path, "w+");
-#    fprintf($file, "%s\t%s\t%s\t%s\n", date('Y-m-d H:i:s'), $package, $id, $ip);
-#    fprintf($file, "%s\n", $data);
+
+    # split recrods by runtime id, and save the ip in $info
+    $rid_dir = "$record_dir/$id";
+    if(!is_dir($rid_dir)) {
+        mkdir($rid_dir);
+    }
+
+    # writting record to file, and log the timestamp-servertime pair.
+    $record_file = "$rid_dir/$timestamp";
+    $time_log = "$rid_dir/time_log";
+    if(!is_file($record_file)) {
+        file_put_contents($record_file, $data);
+        file_put_contents($time_log, "$timestamp\t$now\n");
+    }
 }
 
 
