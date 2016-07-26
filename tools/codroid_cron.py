@@ -19,6 +19,7 @@ import sqlite3
 import hashlib
 import ConfigParser
 from random import Random
+import re
 
 sys.path.append("/home/pkriachu/androguard/")
 sys.path.append("/home/pkriachu/androguard/elsim/")
@@ -79,18 +80,18 @@ def process_uploads() :
         now = time.time()
 
         # append apk infomation to database
-        insert.execute("INSERT INTO apks(apk_id, apk_version, apk_hash, uploader, type, upload_time, process_time) VALUES (?, ?, ?, ?, ?, ? datetime(?, 'unixepoch', 'localtime'))",
+        insert.execute("INSERT INTO apks(apk_id, apk_version, apk_hash, uploader, type, upload_time, process_time) VALUES (?, ?, ?, ?, ?, ?, datetime(?, 'unixepoch', 'localtime'))",
                 (apk_id, apk_version, apk_hash, uploader, modify_type, upload_time, now ))
 
         file_id = insert.lastrowid
-        insert.execute("INSERT INTO files VALUES(?, ?, ?)", (file_id, now+patched_lifetime))
+        insert.execute("INSERT INTO files VALUES(?, ?)", (file_id, now+patched_lifetime))
 
 
         # local patching
         if patch_mode == 'local' :
             # patch apk files
             patch_script = "%s/tools/patch.sh" % (codroid_root)
-            out = subprocess.call([patch_script, patch_file, patch_mode])
+            out = subprocess.call([patch_script, patch_file, patch_mode, str(file_id)])
 
         # remote patching
         elif patch_mode == 'remote' :
@@ -115,7 +116,7 @@ def process_uploads() :
 
             # patch apk files
             patch_script = "%s/tools/patch.sh" % (codroid_root)
-            out = subprocess.call([patch_script, patch_file, "network"])
+            out = subprocess.call([patch_script, patch_file, "network", str(file_id)])
 
             # post-processing: generate the dir for records, and copy the metafile to it.
             records_dir = "%s/records/%s" % (codroid_root, file_id)
@@ -135,9 +136,37 @@ def process_uploads() :
     return
 
 
+def hash_file(file_path) :
+    # read stuff in 64kb chunks
+    BUF_SIZE = 65536
+    hasher = hashlib.md5()
+    with open(file_path, 'rb') as f:
+        while True:
+            data = f.read(BUF_SIZE)
+            if not data :
+                break
+            hasher.update(data)
+    return hasher.hexdigest()
 
-def process_expire() :
-    return
+
+def generate_auth_code(apk_id, uploader, timestamp) :
+    hasher = hashlib.md5()
+    salt = create_salt()
+    hasher.update("%s%s%s%s" % (apk_id, uploader, timestamp , salt))
+    return (hasher.hexdigest(), salt)
+
+
+def create_salt(length = 4) :
+    salt = ''
+    chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789'
+    len_chars = len(chars) - 1
+    random = Random()
+    for i in xrange(length) :
+        # choose a random character from chars
+        salt += chars[random.randint(0, len_chars)] 
+    return salt
+
+
 
 
 
@@ -164,36 +193,33 @@ def is_executed() :
 
 
 
-def hash_file(file_path) :
-    # read stuff in 64kb chunks
-    BUF_SIZE = 65536
-    hasher = hashlib.md5()
-    with open(file_path, 'rb') as f:
-        while True:
-            data = f.read(BUF_SIZE)
-            if not data :
-                break
-            hasher.update(data)
-    return hasher.hexdigest()
 
 
-def generate_auth_code(apk_id, uploader, timestamp) :
-    hasher = hashlib.md5()
-    salt = create_salt()
-    hasher.update("%s%s%s%s" % (apk_id, uploader, timestamp , salt))
-    return (hasher.hexdigest(), salt)
+def check_expire() :
+    codroid_db = codroid_root + '/codroid.db'
+    conn = sqlite3.connect(codroid_db)
+    conn.row_factory = sqlite3.Row
+    query = conn.cursor()
+    insert = conn.cursor()
+    delete = conn.cursor()
 
+    # check files
+    now = time.time()
+    query.execute('SELECT * FROM files')
+    for row in query :
+        file_id = row['id']
+        exp_time = row['exp_time']
 
-
-def create_salt(length = 4) :
-    salt = ''
-    chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789'
-    len_chars = len(chars) - 1
-    random = Random()
-    for i in xrange(length) :
-        # choose a random character from chars
-        salt += chars[random.randint(0, len_chars)] 
-    return salt
+        # if expired
+        if exp_time <= now :
+            pattern = "^%d\..+$" % file_id
+            for file in os.listdir("%s/downloads"%(codroid_root)) :
+                if re.match(pattern, file) :
+                    os.remove("%s/downloads/%s"%(codroid_root, file))
+            delete.execute("DELETE FROM files WHERE id = '%d'" % (file_id))
+        conn.commit()
+    conn.close()
+    return
 
 
 
@@ -204,4 +230,5 @@ if __name__ == "__main__" :
         sys.exit("* CoDroid is already executed.")
 
     process_uploads()
+    check_expire()
 

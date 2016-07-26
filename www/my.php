@@ -84,31 +84,53 @@ a:visited {
     <?php usermenu(); ?>
 
 
+        <div class="col-sm-12">
 <?php
-        $uploads = 0;
-        $apks = array();
-
         $username = $USER->username;
         $db = new PDO("sqlite:$codroid_db");
 
+        $uploads = 0;
         # checking unpatched files
         $query = "SELECT Count(*) FROM uploads WHERE uploader='$username'";
         $result = $db->query($query);
         $row = $result->fetchALL();
         $uploads = $row[0][0];
-
-        # get the infomation of patched apks
-        $query = "SELECT * FROM apkss WHERE uploader='$username' ORDER BY upload_time DESC";
-        $result = $db->query($query);
-        $row = $result->fetchALL();
-
-        
-
-
 ?>
+            <h3>You have <?php echo $uploads; ?> files in the processing queue.</h3>
 
-        <div class="col-sm-12">
-            This block will place the newest uploaded apks and the newest online coverage reports.
+            <h3>Patched files</h3>
+            <ul>
+<?php
+        $apks = array();
+        # get the infomation of patched apks
+        $query = "SELECT * FROM apks WHERE uploader='$username' ORDER BY upload_time DESC";
+        $result = $db->query($query);
+        if($result) {
+            $row = $result->fetchALL();
+
+            # print the newest rows
+            $bound = 5;
+            if(sizeof($row) < $bound) $bound = sizeof($row);
+            for($i=0; $i<$bound; $i++) {
+                $patched_apk = "downloads/" . $row[$i]['id'] . ".patched.apk";
+                $metafile = "downloads/" . $row[$i]['id'] . ".meta";
+                $download_link = "";
+                if(file_exists($patched_apk)) {
+                    $download_link .= "<a href='$patched_apk'>Download APK</a>";
+                    $download_link .= ", <a href='$metafile'>Metafile</a>";
+                }
+?>
+                <li><?php echo $row[$i]['apk_id'];?> uploading at <?php echo $row[$i]['upload_time'];?><br />
+                <?php echo $download_link;?></li>
+<?php
+            }
+        } else {
+?>
+                <li>You have no files patched.</li>
+<?php   }
+?>
+            <i/ul>
+
         </div>
 <?php 
     } ?>
