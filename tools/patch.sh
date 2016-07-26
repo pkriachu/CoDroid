@@ -7,6 +7,7 @@
 
 # $1: file name
 # $2: patch mode
+# $3: file id (in database)
 
 TIME=/usr/bin/time
 CODROID_ROOT=/home/pkriachu/codroid
@@ -21,12 +22,18 @@ fi
 
 APK_NAME=$(echo $1 | sed 's/\.apk$//g')
 
-echo "$0 $@" > $DOWNLOADS/$APK_NAME.log
-echo "$0 $@" > $DOWNLOADS/$APK_NAME.time
+if [ -z ${3+x} ]; then
+	TARGET=$APK_NAME
+else
+	TARGET=$3
+fi
 
-echo $TIME -ap -o $DOWNLOADS/$APK_NAME.time $CODROID_ROOT/package.sh $UPLOADS/$1 $2 >>$DOWNLOADS/$APK_NAME.log 2>&1
-$TIME -ap -o $DOWNLOADS/$APK_NAME.time $CODROID_ROOT/package.sh $UPLOADS/$1 $2 >>$DOWNLOADS/$APK_NAME.log 2>&1
+echo "$0 $@" > $DOWNLOADS/$TARGET.log
+echo "$0 $@" > $DOWNLOADS/$TARGET.time
 
-mv $UPLOADS/$APK_NAME.patched.apk $DOWNLOADS
-mv $UPLOADS/$APK_NAME.meta $DOWNLOADS
+echo $TIME -ap -o $DOWNLOADS/$TARGET.time $CODROID_ROOT/package.sh $UPLOADS/$1 $2 >>$DOWNLOADS/$TARGET.log 2>&1
+$TIME -ap -o $DOWNLOADS/$TARGET.time $CODROID_ROOT/package.sh $UPLOADS/$1 $2 >>$DOWNLOADS/$TARGET.log 2>&1
+
+mv $UPLOADS/$APK_NAME.patched.apk $DOWNLOADS/$TARGET.patched.apk
+mv $UPLOADS/$APK_NAME.meta $DOWNLOADS/$TARGET.meta
 

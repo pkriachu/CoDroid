@@ -75,7 +75,6 @@ a:visited {
     if($task == "index") { ?>
     <h2>Create customized packge for online/offline testing(<?php echo $USER->username; ?>)</h2>
 
-    <div class="container">
     <!-- User menu -->
     <?php usermenu(); ?>
 
@@ -183,7 +182,7 @@ a:visited {
 
     <h2>Sign up to CoDroid.</h2>
 
-    <div class="container">
+    <div class="col-sm-12">
         <form class="form-horizontal col-sm-6" role="form" id="registration" method="post" action="customization.php">
             <input type="hidden" name="task" value="doregist" />
             <input type="hidden" name="op" value="register" />
@@ -221,7 +220,7 @@ a:visited {
     if($task == "doregist") { ?>
     <h2>Sign up to CoDroid.</h2>
 
-    <div class="container">
+    <div class="col-sm-12">
 <?php   if($USER->error=="") { ?>
         <p>Congradtulationis! You have been sign up to CoDroid. Now you can use the remote-patching mode and see the coverage reports on CoDorid. <a href="customization.php?task=login">Sign in and try it now!</a>
     <script type="text/javascript">
@@ -254,7 +253,7 @@ a:visited {
 
     <h2>Sign in to CoDroid.</h2>
 
-    <div class="container">
+    <div class="col-sm-12">
         <form class="form-horizontal col-sm-6" role="form" name="log in" id="login" method="post">
             <input type="hidden" name="task" value="dologin" />
             <input type="hidden" name="op" value="login" />
@@ -325,7 +324,7 @@ a:visited {
 
     <h2>Sign in to CoDroid.</h2>
 
-    <div class="container">
+    <div class="col-sm-12">
         <form class="form-horizontal col-sm-6" role="form" name="log out" id="logout" method="post">
             <input type="hidden" name="task" value="dologout" />
             <input type="hidden" name="op" value="logout" />
@@ -359,7 +358,7 @@ a:visited {
 
 
 
-
+    <p>&nbsp;</p>
 	<?php footer(); ?>
 
 </div> <!-- /container -->
