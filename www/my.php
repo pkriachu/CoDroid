@@ -17,6 +17,9 @@
     $USER = new User();
 
 
+    $codroid_db = "../codroid.db";
+
+
     global $task;
     $task = "not-login";
 
@@ -79,6 +82,30 @@ a:visited {
 
     <!-- User menu -->
     <?php usermenu(); ?>
+
+
+<?php
+        $uploads = 0;
+        $apks = array();
+
+        $username = $USER->username;
+        $db = new PDO("sqlite:$codroid_db");
+
+        # checking unpatched files
+        $query = "SELECT Count(*) FROM uploads WHERE uploader='$username'";
+        $result = $db->query($query);
+        $row = $result->fetchALL();
+        $uploads = $row[0][0];
+
+        # get the infomation of patched apks
+        $query = "SELECT * FROM apkss WHERE uploader='$username' ORDER BY upload_time DESC";
+        $result = $db->query($query);
+        $row = $result->fetchALL();
+
+        
+
+
+?>
 
         <div class="col-sm-12">
             This block will place the newest uploaded apks and the newest online coverage reports.

@@ -27,6 +27,11 @@ echo "$0 $@" > $DOWNLOADS/$APK_NAME.time
 echo $TIME -ap -o $DOWNLOADS/$APK_NAME.time $CODROID_ROOT/package.sh $UPLOADS/$1 $2 >>$DOWNLOADS/$APK_NAME.log 2>&1
 $TIME -ap -o $DOWNLOADS/$APK_NAME.time $CODROID_ROOT/package.sh $UPLOADS/$1 $2 >>$DOWNLOADS/$APK_NAME.log 2>&1
 
-mv $UPLOADS/$APK_NAME.patched.apk $DOWNLOADS
-mv $UPLOADS/$APK_NAME.meta $DOWNLOADS
+if [ -z ${2+x} ]; then
+	mv $UPLOADS/$APK_NAME.patched.apk $DOWNLOADS
+	mv $UPLOADS/$APK_NAME.meta $DOWNLOADS
+else
+	mv $UPLOADS/$APK_NAME.patched.apk $DOWNLOADS/$2.patched.apk
+	mv $UPLOADS/$APK_NAME.meta $DOWNLOADS/$2.meta
+fi
 

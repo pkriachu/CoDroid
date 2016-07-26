@@ -11,6 +11,7 @@
 
 
 import sys, os
+import shutil
 import subprocess
 import time
 import struct
@@ -61,67 +62,49 @@ def process_uploads() :
     # check uploading files
     query.execute('SELECT * FROM uploads')
     for row in query :
+        # common process
+        # pre-processing: collect required infomation
+        patch_file = row['file_name']
+        patch_mode = row['modify_type']
+        apk_path = "%s/uploads/%s" % (codroid_root, patch_file)
+        apk = APK(apk_path)
+
+        apk_id = apk.get_package()
+        apk_version = "%s/%s" % (apk.get_androidversion_code(), apk.get_androidversion_name())
+        apk_hash = row['file_hash']
+        uploader = row['uploader']
+        upload_time = row['upload_time']
+        modify_type = patch_mode
+
+        now = time.time()
+
+        # append apk infomation to database
+        insert.execute("INSERT INTO apks(apk_id, apk_version, apk_hash, uploader, type, upload_time, process_time) VALUES (?, ?, ?, ?, ?, ? datetime(?, 'unixepoch', 'localtime'))",
+                (apk_id, apk_version, apk_hash, uploader, modify_type, upload_time, now ))
+
+        file_id = insert.lastrowid
+        insert.execute("INSERT INTO files VALUES(?, ?, ?)", (file_id, now+patched_lifetime))
+
+
         # local patching
-        if row['modify_type'] == 'local' :
-            # append apk infomation to database
-            patch_file = row['file_name']
-            patch_mode = row['modify_type']
-            apk_path = "%s/uploads/%s" % (codroid_root, patch_file)
-            apk = APK(apk_path)
-
-            apk_id = apk.get_package()
-            apk_version = "%s/%s" % (apk.get_androidversion_code(), apk.get_androidversion_name())
-            apk_hash = hash_file(apk_path)
-            uploader = row['uploader']
-            modify_type = patch_mode
-
-            now = time.time()
-
-            insert.execute("INSERT INTO apks(apk_id, apk_version, apk_hash, uploader, type, process_time) VALUES (?, ?, ?, ?, ?, datetime(?, 'unixepoch', 'localtime'))", (apk_id, apk_version, apk_hash, uploader, modify_type, now ))
-
-            file_id = insert.lastrowid
-            file_path = "%s/downloads/%s" % (codroid_root, patch_file)
-
-            insert.execute("INSERT INTO files VALUES(?, ?, ?)", (file_id, file_path, now+patched_lifetime))
-
+        if patch_mode == 'local' :
             # patch apk files
             patch_script = "%s/tools/patch.sh" % (codroid_root)
             out = subprocess.call([patch_script, patch_file, patch_mode])
 
         # remote patching
-        elif row['modify_type'] == 'remote' :
-            # preprocessing: collect required infomation
-            patch_file = row['file_name']
-            patch_mode = row['modify_type']
-            apk_path = "%s/uploads/%s" % (codroid_root, patch_file)
-            apk = APK(apk_path)
-
-            apk_id = apk.get_package()
-            apk_version = "%s/%s" % (apk.get_androidversion_code(), apk.get_androidversion_name())
-            apk_hash = hash_file(apk_path)
-            uploader = row['uploader']
-            modify_type = patch_mode
-
-            now = time.time()
-
-            # append apk infomation to database
-            insert.execute("INSERT INTO apks(apk_id, apk_version, apk_hash, uploader, type, process_time) VALUES (?, ?, ?, ?, ?, datetime(?, 'unixepoch', 'localtime'))", (apk_id, apk_version, apk_hash, uploader, modify_type, now ))
-
-            file_id = insert.lastrowid
-            file_path = "%s/downloads/%s" % (codroid_root, patch_file)
-
-            insert.execute("INSERT INTO files VALUES(?, ?, ?)", (file_id, file_path, now+patched_lifetime))
-
-            # calculating authentication code
+        elif patch_mode == 'remote' :
+            # generating authentication code
             auth_code = ""
             cur = conn.cursor()
+            # generate an unique auth code
             while auth_code == "" or cur.fetchone() != None :
                 (auth_code, salt) = generate_auth_code(apk_id, uploader, now+remote_lifetime)
                 cur.execute("SELECT fid FROM remote_auth WHERE authcode='%s'" % (auth_code))
-
+            # save the auth info into database
             insert.execute("INSERT INTO remote_auth VALUES (?, ?, ?, ?)", (file_id, auth_code, salt, now+remote_lifetime))
 
-            # preprocessing: setting the transfer infomation
+            # pre-processing (smali): setting the transfer infomation
             with open(codroid_root + '/coverage/org_template/codroid/utility/NetworkWriterTask.smali', 'r') as source, open(codroid_root + '/coverage/org/codroid/utility/NetworkWriterTask.smali', 'w+') as target :
                 content = source.read()
                 write_url = "%s?key=%s" % (submit_url, auth_code)
@@ -134,8 +117,15 @@ def process_uploads() :
             patch_script = "%s/tools/patch.sh" % (codroid_root)
             out = subprocess.call([patch_script, patch_file, "network"])
 
+            # post-processing: generate the dir for records, and copy the metafile to it.
+            records_dir = "%s/records/%s" % (codroid_root, file_id)
+            metafile = "%s/downloads/%s.meta" % (codroid_root, file_id)
+            os.mkdir(records_dir)
+            if os.path.isfile(metafile) :
+                shutil.copy(metafile, "%s/metafile" % (records_dir))
 
-        # remove file from uploads
+
+        # post_processing: remove file from uploads
         delete.execute("DELETE FROM uploads WHERE file_name = '%s'" % (row['file_name']))
         os.remove("%s/uploads/%s" % (codroid_root, row['file_name']))
 
