@@ -117,7 +117,9 @@ if(sizeof($row) == 1) {
     $record_file = "$rid_dir/$timestamp.out";
     $time_log = "$rid_dir/time_log";
     if(!is_file($record_file)) {
-        file_put_contents($record_file, $data);
+        $decoded = base64_decode($data);
+        $inflated = zlib_decode($decoded);
+        file_put_contents($record_file, $inflated);
         file_put_contents($time_log, "$timestamp\t$now\n");
     }
 }

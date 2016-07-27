@@ -46,6 +46,9 @@
 
     function usermenu() {
         global $USER;
+?>
+    <p><a href="customization.php">Upload APK</a> | <a href="view.php">View APKs</a></p>
+<?php
         if ($USER->authenticated) {
 ?>
     <p>Hello, <?php echo $USER->username; ?>. | <a href="#">View your apks</a> | <a href="#">View your online reports</a> | <a href="customization.php?task=logout">Sign out</a></p>

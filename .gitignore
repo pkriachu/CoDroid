@@ -18,8 +18,9 @@ www/uploads/*
 www/downloads/*
 www/records/
 
-#other
+#others
 uploads/*
 downloads/*
 records/*
 tmp/*
+codroid.log

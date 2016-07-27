@@ -15,6 +15,8 @@ import argparse
 import struct
 import array
 import json
+import base64
+import zlib
 import time, datetime
 
 
@@ -31,9 +33,6 @@ class MetaInfo:
 
 
     def __parseMetaFile(self, metafile) :
-        if metafile[-5:] != ".meta" :
-            raise Exception("Failed assignment for meta file.")
-
         # abstract apk id
         self.apkId = os.path.basename(metafile)[:-5]
 
@@ -101,19 +100,22 @@ class MetaInfo:
 class Record :
     def __init__(self) :
         self.__timestamp = 0
-        self.__count_table = dict()
+        self.__countTable = dict()
 
 
-    def loadJSONs(self, timestamp, JSONstr) :
+    def loadJSONs(self, JSONstr, timestamp = 0) :
         self.__timestamp = timestamp;
         self.__count_table = json.loads()
 
 
-    def loadf(self, timestamp, path) :
+    def loadRecordFile(self, path, timestamp = 0) :
         self.__timestamp = timestamp;
         with open(path, 'r') as file :
             content = file.read()
-            
+            self.__countTable = json.loads(content)
+
+    def printTable(self) :
+        print self.__countTable
 
 
 
@@ -122,11 +124,36 @@ class Record :
 if __name__ == "__main__" :
     if len(sys.argv) < 2 :
         exit(0)
+    metafile = sys.argv[1]
+    recordsDir = sys.argv[2]
+
 
     # parsing meta file
-    meta = MetaInfo(sys.argv[1])
+    meta = MetaInfo(metafile)
     
     # parsing record files
-    records = 
+    # loading the timestamp of last modified file
+    last = 0
+    lastfile = os.path.join(recordsDir, 'last')
+    if os.path.isfile(lastfile) :
+        with open(lastfile, 'r') as file :
+            last = int(file.read())
+
+    for file in sorted(os.listdir(recordsDir)) :
+        if file.endswith(".out") :
+            timestamp = int(file.split('.')[0])
+            # skip the files thar already parsed
+            if timestamp <= last :
+                break
+
+            print "Loading %s" % (os.path.join(recordsDir, file))
+            records = Record()
+            records.loadRecordFile(os.path.join(recordsDir, file), timestamp)
+            records.printTable()
+
+            last = timestamp
+
+    with open(lastfile, 'w+') as file :
+        file.write(str(last))
 
 

@@ -27,7 +27,8 @@ from androguard.core.bytecodes.apk import *
 
 
 codroid_root = '/home/pkriachu/codroid'
-codroid_conf = codroid_root + '/codroid.conf'
+codroid_conf = os.path.join(codroid_root, 'codroid.conf')
+codroid_log = os.path.join(codroid_root, 'codroid.log')
 
 remote_lifetime = 259200
 patched_lifetime = 86400
@@ -68,6 +69,7 @@ def process_uploads() :
     for row in query :
         # common process
         # pre-processing: collect required infomation
+        file_id = row['id']
         patch_file = row['file_name']
         patch_mode = row['modify_type']
         apk_path = "%s/uploads/%s" % (codroid_root, patch_file)
@@ -83,10 +85,9 @@ def process_uploads() :
         now = time.time()
 
         # append apk infomation to database
-        insert.execute("INSERT INTO apks(apk_id, apk_version, apk_hash, uploader, type, upload_time, process_time) VALUES (?, ?, ?, ?, ?, ?, datetime(?, 'unixepoch', 'localtime'))",
-                (apk_id, apk_version, apk_hash, uploader, modify_type, upload_time, now ))
+        insert.execute("INSERT INTO apks VALUES (?, ?, ?, ?, ?, ?, ?, datetime(?, 'unixepoch', 'localtime'))",
+                (file_id, apk_id, apk_version, apk_hash, uploader, modify_type, upload_time, now ))
 
-        file_id = insert.lastrowid
         insert.execute("INSERT INTO files VALUES(?, ?)", (file_id, now+patched_lifetime))
 
 
@@ -191,7 +192,7 @@ def is_executed() :
 
         #sys.stderr.write('* out=%s\n' % (out))
 
-        if int(out) == 1 :
+        if int(out) < 3 :
             status = False
         else :
             status = True
@@ -237,10 +238,15 @@ def check_expire() :
 
 
 if __name__ == "__main__" :
+    logfile = open(codroid_log, 'a+')
+
     if is_executed() :
+        print >> logfile, "%s  %s" % (time.strftime("%Y %b %d %H:%M:%S", time.localtime()), "CoDroid is already executed.")
         sys.exit("* CoDroid is already executed.")
 
     init()
     process_uploads()
     check_expire()
+
+    print >> logfile, "%s  %s" % (time.strftime("%Y %b %d %H:%M:%S", time.localtime()), "CoDroid has completed.")
 

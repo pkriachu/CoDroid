@@ -41,6 +41,9 @@
 
     function usermenu() {
         global $USER;
+?>
+    <p><a href="customization.php">Upload APK</a> | <a href="view.php">View APKs</a></p>
+<?php
         if ($USER->authenticated) {
 ?>
     <p>Hello, <?php echo $USER->username; ?>. | <a href="#">View your apks</a> | <a href="#">View your online reports</a> | <a href="customization.php?task=logout">Sign out</a></p>
@@ -151,7 +154,14 @@ a:visited {
             $insert = "INSERT INTO uploads (file_name, file_hash, uploader, modify_type, upload_time) ";
             $insert .= "VALUES ('$file_name', '$hash', '$uploader', '$type', datetime('now', 'localtime'))";
             
-            if ( !$db->exec($insert) ) {
+            if ( $db->exec($insert) ) {
+                $file_id = $db->lastInsertId();
+                $APK_URL = "view.php?id=$file_id";
+?>
+    <p>Your APK will be patched soon. You can download it after patch is completed with above url:</p>
+    <p><a href=<?php echo "\"$APK_URL\""; ?>><?php echo $APK_URL; ?></a>
+<?php
+            } else {
 ?>
     <p>
         Database writting failed.<br />
