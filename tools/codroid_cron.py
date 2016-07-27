@@ -26,9 +26,8 @@ sys.path.append("/home/pkriachu/androguard/elsim/")
 from androguard.core.bytecodes.apk import *
 
 
-codroid_conf = '../codroid.conf'
-
 codroid_root = '/home/pkriachu/codroid'
+codroid_conf = codroid_root + '/codroid.conf'
 
 remote_lifetime = 259200
 patched_lifetime = 86400
@@ -41,13 +40,17 @@ submit_url = ""
 
 
 def init() :
+    # reading common settings
     config = ConfigParser.ConfigParser()
-    config.read(codroid_conf)
 
-    codroid_root = config.get('global', 'codroid_root')
-    patched_lifetime = config.get('global', 'patched_lifetime')
+    with open(codroid_conf, 'r') as conf :
+        config.readfp(conf)
 
-    remote_lifetime = config.get('remote', 'remote_lifetime')
+    global codroid_root, patched_lifetime, remote_lifetime, submit_url
+
+    #codroid_root = config.get('global', 'codroid_root')
+    patched_lifetime = int(config.get('global', 'patched_lifetime'))
+    remote_lifetime = int(config.get('remote', 'remote_lifetime'))
     submit_url = config.get('remote', 'submit_url')
 
 
@@ -108,8 +111,9 @@ def process_uploads() :
             # pre-processing (smali): setting the transfer infomation
             with open(codroid_root + '/coverage/org_template/codroid/utility/NetworkWriterTask.smali', 'r') as source, open(codroid_root + '/coverage/org/codroid/utility/NetworkWriterTask.smali', 'w+') as target :
                 content = source.read()
-                write_url = "%s?key=%s" % (submit_url, auth_code)
-                target.write(content.replace('@SUBMIT_URL@', write_url))
+                content = content.replace('@SUBMIT_URL@', submit_url)
+                content = content.replace('@KEY@', auth_code)
+                target.write(content)
             with open(codroid_root + '/coverage/org_template/codroid/utility/Statistics.smali', 'r') as source, open(codroid_root + '/coverage/org/codroid/utility/Statistics.smali', 'w+') as target :
                 content = source.read()
                 target.write(content.replace('@PACKAGE_NAME@', apk_id))
@@ -125,6 +129,13 @@ def process_uploads() :
             if os.path.isfile(metafile) :
                 shutil.copy(metafile, "%s/metafile" % (records_dir))
 
+            # post-processing: generate the info file for DC-module
+            config = ConfigParser.RawConfigParser()
+            config.add_section('basic')
+            config.set('basic', 'package', apk_id)
+            config.set('basic', 'key', auth_code)
+            with open(records_dir+'/info', 'w+') as info_file :
+                config.write(info_file)
 
         # post_processing: remove file from uploads
         delete.execute("DELETE FROM uploads WHERE file_name = '%s'" % (row['file_name']))
@@ -229,6 +240,7 @@ if __name__ == "__main__" :
     if is_executed() :
         sys.exit("* CoDroid is already executed.")
 
+    init()
     process_uploads()
     check_expire()
 

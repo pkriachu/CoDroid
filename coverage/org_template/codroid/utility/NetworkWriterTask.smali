@@ -392,7 +392,7 @@
 
     move-result-object v18
 
-    const-string v19, "&package="
+    const-string v19, "package="
 
     invoke-virtual/range {v18 .. v19}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
@@ -525,6 +525,19 @@
 
     invoke-virtual/range {v18 .. v18}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
+    move-result-object v15
+
+    .line 100
+    new-instance v18, Ljava/lang/StringBuilder;
+
+    invoke-direct/range {v18 .. v18}, Ljava/lang/StringBuilder;-><init>()V
+    move-object/from16 v0, v18
+    invoke-virtual {v0, v15}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    move-result-object v18
+    const-string v19, "&key=@KEY@"
+    invoke-virtual/range {v18 .. v19}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    move-result-object v18
+    invoke-virtual/range {v18 .. v18}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
     move-result-object v15
 
     .line 101

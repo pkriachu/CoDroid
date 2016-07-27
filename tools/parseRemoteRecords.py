@@ -37,6 +37,7 @@ submit_url = ""
 
 
 def init() :
+    # reading common settings
     config = ConfigParser.ConfigParser()
     config.read(codroid_conf)
 
@@ -50,6 +51,8 @@ def init() :
 
 def parseRemoteRecords(file_id) : 
     records_root = "%s/records/%d" % (cordroid_root, file_id)
+
+    # init: checking info file
 
 
 
