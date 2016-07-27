@@ -4,93 +4,129 @@
 # Author: Kaze Mewno (C.H. Chiu)
 # Last Modify: 2016.6.29
 #
-# This is a cron program that doing following jobs:
-#   1. check the upload list and process files in it.
-#   2. check the expire time of the files that has been modified.
+# Remote records parsing tool
+# 
+# Usage: parseRemoteRecords.py METAFILE RECORDS_FOLDER
 
 
 
-import sys, os
-import shutil
-import subprocess
-import time
+import sys, os, fnmatch, stat
+import argparse
 import struct
-import sqlite3
-import hashlib
-import ConfigParser
-from random import Random
-import re
-
-
-codroid_conf = '../codroid.conf'
-
-codroid_root = '/home/pkriachu/codroid'
-
-remote_lifetime = 259200
-patched_lifetime = 86400
-submit_url = ""
-
-#lock_file = '/tmp/codroid_cron_lock'
-#sleep_interval = 60
-#lock_interval = 2 * sleep_interval
+import array
+import json
+import time, datetime
 
 
 
-def init() :
-    # reading common settings
-    config = ConfigParser.ConfigParser()
-    config.read(codroid_conf)
+class MetaInfo:
+    def __init__(self, path) :
+        self.apkId   = ""
+        self.classes = set()
+        self.methods = set()
+        self.blocks  = dict()   # block = {"className": "", "methodName": "", "blockFlags": 0, "lines": 0}
+        self.lines   = 0
 
-    codroid_root = config.get('global', 'codroid_root')
-    patched_lifetime = config.get('global', 'patched_lifetime')
-
-    remote_lifetime = config.get('remote', 'remote_lifetime')
-    submit_url = config.get('remote', 'submit_url')
-
+        self.__parseMetaFile(path)
 
 
-def parseRemoteRecords(file_id) : 
-    records_root = "%s/records/%d" % (cordroid_root, file_id)
+    def __parseMetaFile(self, metafile) :
+        if metafile[-5:] != ".meta" :
+            raise Exception("Failed assignment for meta file.")
 
-    # init: checking info file
+        # abstract apk id
+        self.apkId = os.path.basename(metafile)[:-5]
+
+        # parse meta info
+        with open(metafile, "r") as infile :
+            while True :
+                block = dict()
+                # read block id
+                readbuffer = infile.read(4)
+                if not readbuffer :
+                    break
+                blockId = struct.unpack("!I", readbuffer)[0]
+
+                # read block flags
+                readbuffer = infile.read(4)
+                block["flags"] = struct.unpack("!I", readbuffer)[0]
+
+                # read lines in block
+                readbuffer = infile.read(4)
+                block["lines"] = struct.unpack("!I", readbuffer)[0]
+
+                # read len of class name
+                readbuffer = infile.read(4)
+                classlen = struct.unpack("!I", readbuffer)[0]
+
+                # read len of method name
+                readbuffer = infile.read(4)
+                methodlen = struct.unpack("!I", readbuffer)[0]
+
+                # read class name
+                readbuffer = infile.read(classlen)
+                block["className"] = readbuffer[:-1]
+
+                # read method name
+                readbuffer = infile.read(methodlen)
+                block["methodName"] = readbuffer[:-1]
+        
+                # skip class detection
+                className = block["className"]
+                if ( className.startswith("Landroid/") or className.startswith("Lcom/google/android/gms") ) :
+                    continue
+                lastToken = className.split('/')[-1][:-1]
+                if ( lastToken == "BuildConfig" or lastToken == "R" or lastToken.startswith("R$") ) :
+                    continue
+
+                # append to block list
+                self.blocks[int(blockId)] = block
+                self.classes.add(block["className"])
+                self.methods.add( "%s->%s" % (block["className"], block["methodName"]) )
+                self.lines += block["lines"]
 
 
 
-    return
+    def printInfo(self) :
+        print "Apk Id : %s" % (self.apkId)
+        print "Classes: %d" % (len(self.classes))
+        print "Methods: %d" % (len(self.methods))
+        print "Blocks : %d (max index: %d)" % (len(self.blocks), max(self.blocks.keys()))
+        print "Lines  : %d" % (self.lines)
 
 
 
 
 
-def is_executed() :
-    status = False
-    try :
-        #sys.stderr.write('* Check CoDroid executeion status...\n')
+class Record :
+    def __init__(self) :
+        self.__timestamp = 0
+        self.__count_table = dict()
 
-        # This command will check how much codroid_cron.py is running, include itself.
-        out = subprocess.check_output('ps ax | grep codroid_cron.py | grep python | grep -cv grep', shell=True)
 
-        #sys.stderr.write('* out=%s\n' % (out))
+    def loadJSONs(self, timestamp, JSONstr) :
+        self.__timestamp = timestamp;
+        self.__count_table = json.loads()
 
-        if int(out) == 1 :
-            status = False
-        else :
-            status = True
 
-    except :
-        #sys.stderr.write('* Exception: %s\n' % (sys.exc_info()[0]))
-        status = False
-
-    return status
-
+    def loadf(self, timestamp, path) :
+        self.__timestamp = timestamp;
+        with open(path, 'r') as file :
+            content = file.read()
+            
 
 
 
 
 
 if __name__ == "__main__" :
-    #    if is_executed() :
-#        sys.exit("* CoDroid is already executed.")
+    if len(sys.argv) < 2 :
+        exit(0)
 
-    parseRemoteRecords()
+    # parsing meta file
+    meta = MetaInfo(sys.argv[1])
+    
+    # parsing record files
+    records = 
+
 
