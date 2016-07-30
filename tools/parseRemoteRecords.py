@@ -85,6 +85,27 @@ class MetaInfo:
                 self.lines += block["lines"]
 
 
+    def getClassSize(self) :
+        return len(self.classes)
+
+
+    def getMethodSize(self) :
+        return len(self.methods)
+
+
+    def getBlockInfo(self, blockId) :
+        return self.blocks[blockId]
+
+
+    def getBlockSize(self) :
+        return len(self.blocks)
+
+
+    def getLineSize(self, blockId = -1) :
+        if blockId == -1 :
+            return self.lines
+        return self.blocks[blockId]
+
 
     def printInfo(self) :
         print "Apk Id : %s" % (self.apkId)
@@ -114,9 +135,38 @@ class Record :
             content = file.read()
             self.__countTable = json.loads(content)
 
+
+    # update table from a newer record
+    # update timestamp, and merge two tables
+    def update(self, newer) :
+        # update timestamp
+        self.timestamp = newer.timestamp
+        
+        # merge two tables
+        for key in newer.__countTable :
+            if key in self.__countTable :
+                self.__countTable[key] += newer.__countTable[key]
+            else :
+                self.__countTable[key] = newer.__countTable[key]
+
+
     def printTable(self) :
         print self.__countTable
 
+
+    def calculateCoverage(self, meta) :
+        coverage = dict("class":0.0, "method":0.0, "block":0.0, "line":0.0)
+        
+        # calculate coverage from block list (count table) and meta
+        classes = set()
+        methods = set()
+        lines = 0
+        
+        for blockId in self.__countTable :
+            # block = {"className": "", "methodName": "", "blockFlags": 0, "lines": 0}
+            block = meta.getBlockInfo(blockId)
+            classes.add(block["className"])
+            methods.add( "%s->%s" % (block["className"], block["methodName"]) )
 
 
 
